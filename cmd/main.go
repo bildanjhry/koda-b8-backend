@@ -9,11 +9,19 @@ import (
 func main() {
 	r := gin.Default()
 	h := handlers.UserHandler{}
+	a := handlers.AuthHandlers{}
 
-	auth := r.Group("/users")
+	auth := r.Group("/auth")
 	{
-		auth.GET("", h.GetAvailUsers)
-		auth.GET("/:id")
+		auth.POST("/login")
+		auth.POST("/register", a.Login)
+		auth.POST("/forgot-password")
+	}
+
+	users := r.Group("/users")
+	{
+		users.GET("", h.GetAvailUsers)
+		users.GET("/:id")
 	}
 
 	r.Run(":8080")

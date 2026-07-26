@@ -4,7 +4,6 @@ import (
 	"backend/internals/libs"
 	"backend/internals/services"
 	"net/http"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -14,23 +13,24 @@ type UserHandler struct {
 }
 
 func (h *UserHandler) GetAvailUsers(ctx *gin.Context) {
-
-	lim, _ := strconv.Atoi(ctx.Query("limit"))
-	pag, _ := strconv.Atoi(ctx.Query("page"))
-
-	QueryParams := libs.QueryParams{
-		SEARCH_PAR: ctx.Query("name"),
-		ORDER_BY:   ctx.Query("sort"),
-		ORDER_TYPE: ctx.Query("orders"),
-		LIMIT:      lim,
-		OFFSET:     pag,
+	var query libs.QueryParams
+	if err := ctx.ShouldBindQuery(&query); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"Success": false,
+			"Status":  http.StatusBadRequest,
+			"Message": "Invalid Query Params",
+		})
+		return
 	}
 
-	res := h.svc.GetAvailUsers(&QueryParams)
+	query.SEARCH_PAR = ctx.QueryMap("search")
+
+	res := h.svc.GetAvailUsers(&query)
 	ctx.JSON(http.StatusAccepted, &libs.UserResponseHttp{
 		Success: true,
 		Status:  http.StatusAccepted,
 		Message: "Success get data",
+		Queries: &query,
 		Results: res,
 	})
 }
