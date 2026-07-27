@@ -12,6 +12,10 @@ type RegisterRequest struct {
 }
 
 type LoginResponse struct {
-	Id    string `json:"id"`
+	Id    int64 `json:"id"`
 	Token string
+}
+
+type RegisterResponse struct {
+	Id int64 `json:"id"`
 }
